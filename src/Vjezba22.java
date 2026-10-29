@@ -1,17 +1,20 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import javax.sql.DataSource;
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+
+import static javax.swing.DropMode.INSERT;
+
+/*import static javax.swing.DropMode.INSERT;*/
 
 
 public class Vjezba22 {
 
     public static void main(String[] args) {
-        Scanner ulaz=new Scanner(System.in);
-        int odabir;
+
+        ArrayList<String>drzave=new ArrayList<>(Arrays.asList("dr1","dr2","dr3","dr4","dr5","dr6","dr7","dr8","dr9","dr10"));
 
         //1. Kreiranje DataSource objekta i stvaranje konekcije
         DataSource dataSource = createDataSource();
@@ -19,50 +22,18 @@ public class Vjezba22 {
 
         try (Connection connection = dataSource.getConnection()) {
             System.out.println("Uspješno spojeni na bazu podataka!");
-            System.out.println("Odaberi:\n1-nova drzava\n2-izmjena postojece drzave\n3-brisanje postojeće drzave\n4-prikaz sortiranih drzava\n5-kraj");
-            System.out.println("Upišite odabir: ");
-            odabir=ulaz.nextInt();
-            ulaz.nextLine();
-            Statement stmt=null;
-            int rowsAffected=0;
-            String naziv=null;
-            switch(odabir){
-                case(1):
-                    System.out.println("Upisi ime drzave");
-                    naziv=ulaz.nextLine();
-                    String sqlInsert = "INSERT INTO Drzava (Naziv) VALUES ('" + naziv + "')";
 
-                    stmt = connection.createStatement();
-                    rowsAffected = stmt.executeUpdate(sqlInsert);
-                    System.out.println("Država je uspješno dodana!");
-                    break;
-                case(2):
-                    System.out.println("Upisi id drzave i novi naziv drzave");
-                    int id=ulaz.nextInt();
-                    ulaz.nextLine();
-                    naziv=ulaz.nextLine();
-                    stmt = connection.createStatement();
-                    rowsAffected = stmt.executeUpdate("UPDATE Drzava SET Naziv = '" + naziv + "' WHERE idDrzava = " + id);
 
-                    System.out.println("Država je uspješno preimenovana!");
-                    break;
+           PreparedStatement stmt;
+            stmt = connection.prepareStatement("INSERT INTO Drzava (Naziv) VALUES(?)");
+            for(String d : drzave) {
+                stmt.setString(1,d);
 
+                stmt.executeUpdate();
             }
 
 
-            /*2. preimenovanje države Hrvatska->Croatia
-            Statement stmt = connection.createStatement();
-            int rowsAffected = stmt.executeUpdate("UPDATE Drzava SET Naziv= 'Croatia' WHERE idDrzava=1");
-            System.out.println("Država je uspješno preimenovana!");
-
-            //3. dohvaćanje svih država
-            ResultSet rs = stmt.executeQuery("SELECT IdDrzava, Naziv FROM Drzava");
-            while( rs.next() ) {
-                System.out.printf("%d %s\n", rs.getInt("idDrzava"), rs.getString("Naziv"));
-            }*/
-
-
-        } catch (SQLException e) {
+        }catch (SQLException e) {
             System.err.println("Greška prilikom spajanja na bazu podataka:");
             e.printStackTrace();
         }
