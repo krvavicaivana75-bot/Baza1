@@ -32,6 +32,14 @@ public class Vjezba22 {
                 stmt.executeUpdate();
             }
 
+            CallableStatement cs= connection.prepareCall("{CALL brisanje_drzava(?)}");
+                cs.setInt(1, 8);
+                cs.executeUpdate();
+
+
+
+
+
 
         }catch (SQLException e) {
             System.err.println("Greška prilikom spajanja na bazu podataka:");
